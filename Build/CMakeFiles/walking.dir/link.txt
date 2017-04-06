@@ -1,0 +1,2 @@
+/usr/bin/ar qc libwalking.a  CMakeFiles/walking.dir/src/Vector.cpp.o CMakeFiles/walking.dir/src/Matrix.cpp.o CMakeFiles/walking.dir/src/Kinematics.cpp.o CMakeFiles/walking.dir/src/Point.cpp.o CMakeFiles/walking.dir/Walking.cpp.o
+/usr/bin/ranlib libwalking.a
