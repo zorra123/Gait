@@ -12,7 +12,7 @@
 //#include "MotionStatus.h"
 #include "Kinematics.h" 
 #include "Walking.h"
-#include "const.h"
+#include "defines.h"
 using namespace Robot;
 
 

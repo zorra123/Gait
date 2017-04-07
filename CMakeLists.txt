@@ -19,7 +19,7 @@ set (SRC
         #include/JointData.h
         #include/MotionManager.h
 	include/Point.h
-	Walking.h  
+		include/Walking.h
 	src/Vector.cpp 
 	src/Matrix.cpp 
         #src/MX28.cpp
@@ -29,7 +29,7 @@ set (SRC
         #src/JointData.cpp
         #src/MotionManager.cpp
 	src/Point.cpp
-        include/const.h
-	Walking.cpp)
+		include/defines.h
+        src/Walking.cpp)
 
 add_library (walking ${SRC} )
