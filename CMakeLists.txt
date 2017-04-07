@@ -9,27 +9,25 @@ include_directories (include/)
 
 set (SRC 
         #include/MotionModule.h
-	include/Vector.h 
-	include/Matrix.h 
+        include/vector.h
+		include/matrix.h
         #include/MX28.h
         #include/MotionStatus.h
-	include/Kinematics.h
-        #include/CM730.h
+		#include/CM730.h
         #include/FSR.h
         #include/JointData.h
         #include/MotionManager.h
-	include/Point.h
-		include/Walking.h
-	src/Vector.cpp 
-	src/Matrix.cpp 
+		include/point.h
+        include/walking.h
+        src/vector.cpp
+		src/matrix.cpp
         #src/MX28.cpp
         #src/MotionStatus.cpp
-	src/Kinematics.cpp
-        #src/CM730.cpp
+		#src/CM730.cpp
         #src/JointData.cpp
         #src/MotionManager.cpp
-	src/Point.cpp
+		src/point.cpp
 		include/defines.h
-        src/Walking.cpp)
+        src/walking.cpp)
 
 add_library (walking ${SRC} )
