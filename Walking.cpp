@@ -566,7 +566,7 @@ void Walking::Process()
             offset += (double)dir[i] * pelvis_offset_l;
         else if(i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
             offset -= (double)dir[i] * HIP_PITCH_OFFSET;// * MX28::RATIO_ANGLE2VALUE;//todo
-
+//почему стоит знак -
         outValue[i] = Angle2Value(initAngle[i]) + (int)offset;//todo
     }
 
@@ -580,17 +580,46 @@ void Walking::Process()
         double rlGyroErr = RL_GYRO;
         double fbGyroErr = FB_GYRO;
 
-        outValue[1] += (int)(dir[1] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // R_HIP_ROLL
-        outValue[7] += (int)(dir[7] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // L_HIP_ROLL
+        /*
+ double rlGyroErr = MotionStatus::RL_GYRO;
+  double fbGyroErr = MotionStatus::FB_GYRO;
+ */
+
+        double rlGyroErr = RL_GYRO;
+        double fbGyroErr = FB_GYRO;
+
+
+//      constant BALANCE_HIP_ROLL_GAIN is changed to:
+RL_BALANCE_HIP_ROLL_GAIN    = 0.3;
+FB_BALANCE_HIP_ROLL_GAIN    = 0.3;
+RL_BALANCE_HIP_PITCH_GAIN   = 0.3;
+FB_BALANCE_HIP_PITCH_GAIN   = 0.3;
+
+
+
+        outvalue[1] += (int)(dir[1] * (rlGyroErr * RL_BALANCE_HIP_ROLL_GAIN + fbGyroErr * FB_BALANCE_HIP_ROLL_GAIN) * 4);
+        outvalue[7] += (int)(dir[7] * (rlGyroErr * RL_BALANCE_HIP_ROLL_GAIN + fbGyroErr * FB_BALANCE_HIP_ROLL_GAIN) * 4);
+
+
+//outValue[1] += (int)(dir[1] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // R_HIP_ROLL
+//outValue[7] += (int)(dir[7] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // L_HIP_ROLL
+
+
+// added
+        outvalue[2] += (int)(dir[2] * (rlGyroErr * RL_BALANCE_HIP_PITCH_GAIN + fbGyroErr * FB_BALANCE_HIP_PITCH_GAIN) * 4);
+        outvalue[8] += (int)(dir[8] * (rlGyroErr * RL_BALANCE_HIP_PITCH_GAIN + fbGyroErr * FB_BALANCE_HIP_PITCH_GAIN) * 4);
 
         outValue[3] -= (int)(dir[3] * fbGyroErr * BALANCE_KNEE_GAIN*4); // R_KNEE
         outValue[9] -= (int)(dir[9] * fbGyroErr * BALANCE_KNEE_GAIN*4); // L_KNEE
 
+
         outValue[4] -= (int)(dir[4] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN*4); // R_ANKLE_PITCH
         outValue[10] -= (int)(dir[10] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN*4); // L_ANKLE_PITCH
 
+
         outValue[5] -= (int)(dir[5] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // R_ANKLE_ROLL
         outValue[11] -= (int)(dir[11] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // L_ANKLE_ROLL
+
     }
     // вызов одометрии
     odometry(x_move_r,y_move_r,a_move_r,x_move_l,y_move_l,a_move_l);

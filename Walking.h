@@ -134,6 +134,11 @@ namespace Robot
 		double PELVIS_OFFSET;
 		double HIP_PITCH_OFFSET;
 
+		double RL_BALANCE_HIP_ROLL_GAIN;
+		double FB_BALANCE_HIP_ROLL_GAIN;
+		double RL_BALANCE_HIP_PITCH_GAIN;
+		double FB_BALANCE_HIP_PITCH_GAIN;
+
 		int    P_GAIN;
 		int    I_GAIN;
 		int    D_GAIN;
