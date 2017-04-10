@@ -35,12 +35,13 @@ Walking::Walking()
     Z_MOVE_AMPLITUDE = 40;
     Y_SWAP_AMPLITUDE = 20.0;
     Z_SWAP_AMPLITUDE = 5;
-    PELVIS_OFFSET = 3.0;
+    PELVIS_OFFSET = 3.0;//отклоние таза
     ARM_SWING_GAIN = 1.5;
     BALANCE_KNEE_GAIN = 0.3;
     BALANCE_ANKLE_PITCH_GAIN = 0.9;
     BALANCE_HIP_ROLL_GAIN = 0.5;
     BALANCE_ANKLE_ROLL_GAIN = 1.0;
+    BALANCE_HIP_PITCH_GAIN = 0.3;
 /* todo GAIN
     P_GAIN = JointData::P_GAIN_DEFAULT;//todo 
     I_GAIN = JointData::I_GAIN_DEFAULT;//todo
@@ -141,12 +142,15 @@ void Walking::SaveINISettings(minIni* ini, const std::string &section)
     ini->put(section,   "i_gain",                   I_GAIN);
     ini->put(section,   "d_gain",                   D_GAIN);
 }*/
+// методы из других h
 void Walking::SetAngle(int id, double angle){}
 void SetPGain(int id, double angle){}
 int SetValue(int id, double angle){}
+
+void odometry(double x_r,double y_r,double a_r,double x_l,double y_l,double a_l){}
 double Walking::wsin(double time, double period, double period_shift, double mag, double mag_shift)
 {
-    return mag * sin(2 * 3.141592 / period * time - period_shift) + mag_shift;
+    return mag * sin(2 * 3.141592 / period * time - period_shift) + mag_shift; //mag - магнитуда
 }
 
 bool Walking::computeIK(double *out, double x, double y, double z, double a, double b, double c)
@@ -359,7 +363,7 @@ void Walking::Process()
     double pelvis_offset_r, pelvis_offset_l;
     double angle[14], ep[12];
     double offset;
-//    double TIME_UNIT = MotionModule::TIME_UNIT; <- было, в MotionModule лежало: static const int TIME_UNIT = 8; //msec  
+//  todo  double TIME_UNIT = MotionModule::TIME_UNIT; <- было, в MotionModule лежало: static const int TIME_UNIT = 8; //msec
     double TIME_UNIT = 8;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     int dir[14]          = {   -1,        -1,          1,         1,         -1,            1,          -1,        -1,         -1,         -1,         1,            1,           1,           -1      };
@@ -588,6 +592,8 @@ void Walking::Process()
         outValue[5] -= (int)(dir[5] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // R_ANKLE_ROLL
         outValue[11] -= (int)(dir[11] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // L_ANKLE_ROLL
     }
+    // вызов одометрии
+    odometry(x_move_r,y_move_r,a_move_r,x_move_l,y_move_l,a_move_l);
 /* todo SetValue */
     SetValue(ID_R_HIP_YAW,           outValue[0]);
     SetValue(ID_R_HIP_ROLL,          outValue[1]);

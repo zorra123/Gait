@@ -127,6 +127,7 @@ namespace Robot
 		double BALANCE_ANKLE_PITCH_GAIN;
 		double BALANCE_HIP_ROLL_GAIN;
 		double BALANCE_ANKLE_ROLL_GAIN;
+        double BALANCE_HIP_PITCH_GAIN;//todo test
 		double Y_SWAP_AMPLITUDE;
 		double Z_SWAP_AMPLITUDE;
 		double ARM_SWING_GAIN;
@@ -149,8 +150,9 @@ namespace Robot
 		void Start();
 		void Stop();
 		void Process();
+        void odometry(double x_r,double y_r,double a_r,double x_l,double y_l,double a_l);
 		bool IsRunning();
-		//todo  SetAngle SetPGain из JointData
+        //todo  SetAngle SetPGain из JointData
 		void SetAngle(int id, double angle);
 		void SetPGain(int id, int pgain);
 		void SetValue(int id, int value);
@@ -159,8 +161,8 @@ namespace Robot
 		void LoadINISettings(minIni* ini);
 		void LoadINISettings(minIni* ini, const std::string &section);
 		void SaveINISettings(minIni* ini);
-		void SaveINISettings(minIni* ini, const std::string &section);
-	*/
+        void SaveINISettings(minIni* ini, const std::string &section);
+*/
 	};
 }
 
