@@ -35,12 +35,13 @@ Walking::Walking()
     Z_MOVE_AMPLITUDE = 40;
     Y_SWAP_AMPLITUDE = 20.0;
     Z_SWAP_AMPLITUDE = 5;
-    PELVIS_OFFSET = 3.0;
+    PELVIS_OFFSET = 3.0;//отклоние таза
     ARM_SWING_GAIN = 1.5;
     BALANCE_KNEE_GAIN = 0.3;
     BALANCE_ANKLE_PITCH_GAIN = 0.9;
     BALANCE_HIP_ROLL_GAIN = 0.5;
     BALANCE_ANKLE_ROLL_GAIN = 1.0;
+    BALANCE_HIP_PITCH_GAIN = 0.3;
 /* todo GAIN
     P_GAIN = JointData::P_GAIN_DEFAULT;//todo 
     I_GAIN = JointData::I_GAIN_DEFAULT;//todo
@@ -141,12 +142,14 @@ void Walking::SaveINISettings(minIni* ini, const std::string &section)
     ini->put(section,   "i_gain",                   I_GAIN);
     ini->put(section,   "d_gain",                   D_GAIN);
 }*/
+// методы из других h
 void Walking::SetAngle(int id, double angle){}
 void SetPGain(int id, double angle){}
 int SetValue(int id, double angle){}
+
 double Walking::wsin(double time, double period, double period_shift, double mag, double mag_shift)
 {
-    return mag * sin(2 * 3.141592 / period * time - period_shift) + mag_shift;
+    return mag * sin(2 * 3.141592 / period * time - period_shift) + mag_shift; //mag - магнитуда
 }
 
 bool Walking::computeIK(double *out, double x, double y, double z, double a, double b, double c)
@@ -359,7 +362,7 @@ void Walking::Process()
     double pelvis_offset_r, pelvis_offset_l;
     double angle[14], ep[12];
     double offset;
-//    double TIME_UNIT = MotionModule::TIME_UNIT; <- было, в MotionModule лежало: static const int TIME_UNIT = 8; //msec  
+//  todo  double TIME_UNIT = MotionModule::TIME_UNIT; <- было, в MotionModule лежало: static const int TIME_UNIT = 8; //msec
     double TIME_UNIT = 8;
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     int dir[14]          = {   -1,        -1,          1,         1,         -1,            1,          -1,        -1,         -1,         -1,         1,            1,           1,           -1      };
@@ -562,7 +565,7 @@ void Walking::Process()
             offset += (double)dir[i] * pelvis_offset_l;
         else if(i == 2 || i == 8) // R_HIP_PITCH or L_HIP_PITCH
             offset -= (double)dir[i] * HIP_PITCH_OFFSET;// * MX28::RATIO_ANGLE2VALUE;//todo
-
+//почему стоит знак -
         outValue[i] = Angle2Value(initAngle[i]) + (int)offset;//todo
     }
 
@@ -576,18 +579,42 @@ void Walking::Process()
         double rlGyroErr = RL_GYRO;
         double fbGyroErr = FB_GYRO;
 
-        outValue[1] += (int)(dir[1] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // R_HIP_ROLL
-        outValue[7] += (int)(dir[7] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // L_HIP_ROLL
+
+
+//      constant BALANCE_HIP_ROLL_GAIN is changed to:
+RL_BALANCE_HIP_ROLL_GAIN    = 0.3;
+FB_BALANCE_HIP_ROLL_GAIN    = 0.3;
+RL_BALANCE_HIP_PITCH_GAIN   = 0.3;
+FB_BALANCE_HIP_PITCH_GAIN   = 0.3;
+
+
+
+        outvalue[1] += (int)(dir[1] * (rlGyroErr * RL_BALANCE_HIP_ROLL_GAIN + fbGyroErr * FB_BALANCE_HIP_ROLL_GAIN) * 4);
+        outvalue[7] += (int)(dir[7] * (rlGyroErr * RL_BALANCE_HIP_ROLL_GAIN + fbGyroErr * FB_BALANCE_HIP_ROLL_GAIN) * 4);
+
+
+//outValue[1] += (int)(dir[1] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // R_HIP_ROLL
+//outValue[7] += (int)(dir[7] * rlGyroErr * BALANCE_HIP_ROLL_GAIN*4); // L_HIP_ROLL
+
+
+// added
+        outvalue[2] += (int)(dir[2] * (rlGyroErr * RL_BALANCE_HIP_PITCH_GAIN + fbGyroErr * FB_BALANCE_HIP_PITCH_GAIN) * 4);
+        outvalue[8] += (int)(dir[8] * (rlGyroErr * RL_BALANCE_HIP_PITCH_GAIN + fbGyroErr * FB_BALANCE_HIP_PITCH_GAIN) * 4);
 
         outValue[3] -= (int)(dir[3] * fbGyroErr * BALANCE_KNEE_GAIN*4); // R_KNEE
         outValue[9] -= (int)(dir[9] * fbGyroErr * BALANCE_KNEE_GAIN*4); // L_KNEE
 
+
         outValue[4] -= (int)(dir[4] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN*4); // R_ANKLE_PITCH
         outValue[10] -= (int)(dir[10] * fbGyroErr * BALANCE_ANKLE_PITCH_GAIN*4); // L_ANKLE_PITCH
 
+
         outValue[5] -= (int)(dir[5] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // R_ANKLE_ROLL
         outValue[11] -= (int)(dir[11] * rlGyroErr * BALANCE_ANKLE_ROLL_GAIN*4); // L_ANKLE_ROLL
+
     }
+    // вызов одометрии
+
 /* todo SetValue */
     SetValue(ID_R_HIP_YAW,           outValue[0]);
     SetValue(ID_R_HIP_ROLL,          outValue[1]);
