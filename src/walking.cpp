@@ -48,7 +48,7 @@ walking::walking() {
     y_move_amplitude = 0;
     a_move_amplitude = 0;
     a_move_aim_on = false;
-    balance_enable = true;
+    m_balance_enable = true;
 /* todo set_angle */
     set_angle(joint::ID_R_SHOULDER_PITCH, -48.345);
     set_angle(joint::ID_L_SHOULDER_PITCH, 41.313);
@@ -353,16 +353,12 @@ void walking::process() {
     double x_move_l, y_move_l, z_move_l, a_move_l, b_move_l, c_move_l;
     double pelvis_offset_r, pelvis_offset_l;
     double angle[14], ep[12];
-    double offset;
-//    double TIME_UNIT = MotionModule::TIME_UNIT; <- было, в MotionModule лежало: static const int TIME_UNIT = 8; //msec
     //                     R_HIP_YAW, R_HIP_ROLL, R_HIP_PITCH, R_KNEE, R_ANKLE_PITCH, R_ANKLE_ROLL, L_HIP_YAW, L_HIP_ROLL, L_HIP_PITCH, L_KNEE, L_ANKLE_PITCH, L_ANKLE_ROLL, R_ARM_SWING, L_ARM_SWING
     double dir[14] = {-1, -1, 1, 1, -1, 1, -1, -1, -1, -1, 1, 1, 1, -1};
-    double init_angle[14] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -48.345, 41.313};
 
     // Update walk parameters
     if (m_time == 0) {
-        update_param_time();
-        m_phase = PHASE0;
+        this->update_param_time();
         if (!m_ctrl_running) {
             if (m_x_move_amplitude == 0 &&
                     m_y_move_amplitude == 0 &&
@@ -377,12 +373,10 @@ void walking::process() {
     } else if (m_time >= (m_phase_time1 - TIME_UNIT / 2) &&
                m_time < (m_phase_time1 + TIME_UNIT / 2)) {
         this->update_param_move();
-        m_phase = PHASE1;
     } else if (m_time >= (m_phase_time2 - TIME_UNIT / 2) &&
                m_time < (m_phase_time2 + TIME_UNIT / 2)) {
-        update_param_time();
+        this->update_param_time();
         m_time = m_phase_time2;
-        m_phase = PHASE2;
         if (!m_ctrl_running) {
             if (m_x_move_amplitude == 0 &&
                     m_y_move_amplitude == 0 &&
@@ -397,7 +391,6 @@ void walking::process() {
     } else if (m_time >= (m_phase_time3 - TIME_UNIT / 2) &&
                m_time < (m_phase_time3 + TIME_UNIT / 2)) {
         this->update_param_move();
-        m_phase = PHASE3;
     }
     this->update_param_balance();
 
@@ -670,8 +663,8 @@ void walking::process() {
 
     // Compute arm swing
     if (m_x_move_amplitude == 0) {
-        angle[R_ARM_SWING] = 0; // Right
-        angle[L_ARM_SWING] = 0; // Left
+        angle[R_ARM_SWING] = 0;
+        angle[L_ARM_SWING] = 0;
     } else {
         angle[R_ARM_SWING] = wsin(m_time, m_period_time, PI * 1.5, -m_x_move_amplitude * m_arm_swing_gain, 0);
         angle[L_ARM_SWING] = wsin(m_time, m_period_time, PI * 1.5, m_x_move_amplitude * m_arm_swing_gain, 0);
@@ -697,12 +690,15 @@ void walking::process() {
     angle[L_HIP_ROLL] += pelvis_offset_l;
     angle[R_HIP_PITCH] -= hip_pitch_offset;
     angle[L_HIP_PITCH] -= hip_pitch_offset;
+    angle[R_ARM_SWING] -= 48.345;
+    angle[L_ARM_SWING] += 41.313;
+
     for (int i = 0; i < NUM_OF_JOINTS; i++) {
-        angle[i] = (init_angle[i] + angle[i]) * dir[i];
+        angle[i] = angle[i] * dir[i];
     }
 
     // adjust balance offset
-    if (balance_enable) {
+    if (m_balance_enable) {
 //         TODO Read from message
         double rl_gyro_err = 0;// RL_GYRO;
         double fb_gyro_err = 0;// FB_GYRO;
