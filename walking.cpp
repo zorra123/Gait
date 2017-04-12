@@ -1,31 +1,3 @@
-
-Skip to content
-This repository
-
-    Pull requests
-    Issues
-    Gist
-
-    @zorra123
-
-1
-0
-
-    0
-
-zorra123/Gait
-Code
-Issues 0
-Pull requests 0
-Projects 0
-Wiki
-Pulse
-Graphs
-Settings
-Gait/src/walking.cpp
-ae4737d 2 hours ago
-@arssivka arssivka Some changes
-743 lines (665 sloc) 31.2 KB
 /*
  *   Walking.cpp
  *
@@ -749,15 +721,15 @@ double cos_l = cos(ep[L_YAW]);
         angle[R_HIP_ROLL] += dir[R_HIP_ROLL] * rl_gyro_err * balance_hip_roll_gain * 4;//1
         angle[L_HIP_ROLL] += dir[L_HIP_ROLL] * rl_gyro_err * balance_hip_roll_gain * 4;//7
 */
-        angle[R_HIP_ROLL] += dir[R_HIP_ROLL] * (rl_gyro_err * balance_hip_roll_gain * sin_r + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * cos_r )* 4;//1
-        angle[L_HIP_ROLL] += dir[L_HIP_ROLL] * (rl_gyro_err * balance_hip_roll_gain * sin_l + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * cos_l ) * 4;//7
+        angle[R_HIP_ROLL] += dir[R_HIP_ROLL] * (rl_gyro_err * balance_hip_roll_gain * cos_r + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * sin_r )* 4;//1
+        angle[L_HIP_ROLL] += dir[L_HIP_ROLL] * (rl_gyro_err * balance_hip_roll_gain * cos_l + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * sin_r ) * 4;//7
 
 
 
         
 //added
-	    angle[R_HIP_PITCH] += dir[R_HIP_PITCH] * (rl_gyro_err * balance_hip_roll_gain * cos_r + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * sin_r ) * 4);//2
-        angle[L_HIP_PITCH] += dir[L_HIP_PITCH] * (rl_gyro_err * balance_hip_roll_gain * cos_l + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * sin_l );//8
+        angle[R_HIP_PITCH] += dir[R_HIP_PITCH] * (rl_gyro_err * balance_hip_roll_gain * sin_r + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * cos_r ) * 4;//2
+        angle[L_HIP_PITCH] += dir[L_HIP_PITCH] * (rl_gyro_err * balance_hip_roll_gain * sin_l + fb_gyro_err * FB_BALANCE_HIP_PITCH_GAIN * cos_l ) * 4;//8
 
         angle[R_KNEE] -= dir[R_KNEE] * fb_gyro_err * balance_knee_gain * 4;//3
         angle[L_KNEE] -= dir[L_KNEE] * fb_gyro_err * balance_knee_gain * 4;//9
