@@ -706,7 +706,7 @@ double cos_l = cos(ep[L_YAW]);
     angle[R_ARM_SWING] -= 48.345;
     angle[L_ARM_SWING] += 41.313;
 
-    for (int i = 0; i < NUMBER_OF_JOINTS; i++) {
+    for (int i = 0; i < NUM_OF_JOINTS; i++) {
         angle[i] = angle[i] * dir[i];
     }
 
@@ -766,8 +766,6 @@ double cos_l = cos(ep[L_YAW]);
     */
 }
 
-    Contact GitHub API Training Shop Blog About 
 
-    © 2017 GitHub, Inc. Terms Privacy Security Status Help 
 
 
